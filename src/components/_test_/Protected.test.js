@@ -2,25 +2,27 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from '../ProtectedRoute'; 
-import { addUser, removeUser } from '../../utils/userSlice';
+import ProtectedRoute from '../ProtectedRoute';
 import appStore from '../../utils/appstore';
+import { addUser, removeUser } from '../../utils/userSlice';
+
+const MockDashboard = () => <div>Protected Dashboard</div>;
+const MockLogin = () => <div>Login Page</div>;
 
 describe('ProtectedRoute Component', () => {
-  test('renders children when user is authenticated', () => {
-    const store = appStore; 
-
-    store.dispatch(addUser({ uid: '123', email: 'test@example.com' }));
+  test('redirects to login if user is not authenticated', () => {
+    appStore.dispatch(removeUser());
 
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/protected']}>
+      <Provider store={appStore}>
+        <MemoryRouter initialEntries={['/dashboard']}>
           <Routes>
+            <Route path="/" element={<MockLogin />} />
             <Route
-              path="/protected"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <h1>Protected Page</h1>
+                  <MockDashboard />
                 </ProtectedRoute>
               }
             />
@@ -29,23 +31,22 @@ describe('ProtectedRoute Component', () => {
       </Provider>
     );
 
-    expect(screen.getByText(/Protected Page/i)).toBeInTheDocument();
+    expect(screen.getByText('Login Page')).toBeInTheDocument();
   });
 
-  test('redirects to home page when user is not authenticated', () => {
-    const store = appStore; 
-
-    store.dispatch(removeUser());
+  test('renders protected component if user is authenticated', () => {
+    appStore.dispatch(addUser({ email: 'test@example.com' }));
 
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/protected']}>
+      <Provider store={appStore}>
+        <MemoryRouter initialEntries={['/dashboard']}>
           <Routes>
+            <Route path="/" element={<MockLogin />} />
             <Route
-              path="/protected"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <h1>Protected Page</h1>
+                  <MockDashboard />
                 </ProtectedRoute>
               }
             />
@@ -54,7 +55,6 @@ describe('ProtectedRoute Component', () => {
       </Provider>
     );
 
-    expect(screen.queryByText(/Protected Page/i)).toBeNull();
-    expect(window.location.pathname).toBe('/');
+    expect(screen.getByText('Protected Dashboard')).toBeInTheDocument();
   });
 });

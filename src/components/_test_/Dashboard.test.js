@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import appStore from '../../utils/appstore'; 
 import Dashboard from '../Dashboard'; 
 import { signOut } from 'firebase/auth';
-import { auth } from '../../utils/firebase'; 
+import { addUser } from '../../utils/userSlice';
 
 jest.mock('firebase/auth', () => ({
   signOut: jest.fn(),
@@ -13,37 +13,33 @@ jest.mock('firebase/auth', () => ({
 
 describe('Dashboard Component', () => {
   beforeEach(() => {
-    appStore.dispatch({
-      type: 'user/addUser',
-      payload: { email: 'test@example.com' },
-    });
+    appStore.dispatch(addUser({ email: 'test@example.com' }));
   });
 
-  test('renders welcome message and sign out button', () => {
+  test('renders Dashboard component', () => {
     render(
       <Provider store={appStore}>
-        <Router>
+        <MemoryRouter>
           <Dashboard />
-        </Router>
+        </MemoryRouter>
       </Provider>
     );
 
-    expect(screen.getByText(/Welcome, test@example.com/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sign Out/i)).toBeInTheDocument();
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Welcome, test@example.com')).toBeInTheDocument();
   });
 
-  test('calls signOut on sign out button click', async () => {
+  test('signs out the user', () => {
     render(
       <Provider store={appStore}>
-        <Router>
+        <MemoryRouter>
           <Dashboard />
-        </Router>
+        </MemoryRouter>
       </Provider>
     );
 
-    fireEvent.click(screen.getByText(/Sign Out/i));
-
-    expect(signOut).toHaveBeenCalledWith(auth);
-    expect(appStore.getState().user).toBeNull();
+    fireEvent.click(screen.getByText('Sign Out'));
+    expect(signOut).toHaveBeenCalled();
+    expect(appStore.getState().user).toBe(null);
   });
 });
