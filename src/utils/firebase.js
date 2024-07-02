@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics, isSupported,  } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth } from "firebase/auth"
+console.log(getAuth);
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,18 +21,15 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Function to initialize analytics
-const initializeAnalytics = async () => {
-  if (typeof window !== 'undefined' && await isSupported()) {
-    return getAnalytics(app);
-  }
-  return null;
-};
-
+// Conditionally initialize analytics
 let analytics;
-initializeAnalytics().then((initializedAnalytics) => {
-  analytics = initializedAnalytics;
-});
+if (typeof window !== 'undefined') {
+  (async () => {
+    if (await isSupported()) {
+      analytics = getAnalytics(app);
+    }
+  })();
+}
 
-export const auth = getAuth(app); // Pass the app instance to getAuth
+export const auth = getAuth(app); // Correctly pass the app instance to getAuth
 export { analytics };

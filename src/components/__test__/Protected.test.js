@@ -5,12 +5,13 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from '../ProtectedRoute';
 import appStore from '../../utils/appstore';
 import { addUser, removeUser } from '../../utils/userSlice';
+import "@testing-library/jest-dom";
 
 const MockDashboard = () => <div>Protected Dashboard</div>;
 const MockLogin = () => <div>Login Page</div>;
 
 describe('ProtectedRoute Component', () => {
-  test('redirects to login if user is not authenticated', () => {
+  test('should redirect to login if user is not authenticated', () => {
     appStore.dispatch(removeUser());
 
     render(
@@ -34,7 +35,7 @@ describe('ProtectedRoute Component', () => {
     expect(screen.getByText('Login Page')).toBeInTheDocument();
   });
 
-  test('renders protected component if user is authenticated', () => {
+  test('should render protected component if user is authenticated', () => {
     appStore.dispatch(addUser({ email: 'test@example.com' }));
 
     render(

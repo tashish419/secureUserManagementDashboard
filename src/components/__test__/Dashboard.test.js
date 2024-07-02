@@ -6,17 +6,18 @@ import appStore from '../../utils/appstore';
 import Dashboard from '../Dashboard'; 
 import { signOut } from 'firebase/auth';
 import { addUser } from '../../utils/userSlice';
+import "@testing-library/jest-dom";
 
 jest.mock('firebase/auth', () => ({
   signOut: jest.fn(),
 }));
 
-describe('Dashboard Component', () => {
+describe('Dashboard Component test cases', () => {
   beforeEach(() => {
     appStore.dispatch(addUser({ email: 'test@example.com' }));
   });
 
-  test('renders Dashboard component', () => {
+  test('should render Dashboard component', () => {
     render(
       <Provider store={appStore}>
         <MemoryRouter>
@@ -29,7 +30,7 @@ describe('Dashboard Component', () => {
     expect(screen.getByText('Welcome, test@example.com')).toBeInTheDocument();
   });
 
-  test('signs out the user', () => {
+  test('should sign out the user', () => {
     render(
       <Provider store={appStore}>
         <MemoryRouter>

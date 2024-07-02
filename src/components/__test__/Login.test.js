@@ -1,17 +1,18 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter} from 'react-router-dom';
 import appStore from '../../utils/appstore';
 import Login from '../Login';
+import "@testing-library/jest-dom";
 
-describe('Login Component', () => {
-  test('renders login form', () => {
+describe('Login Component test cases', () => {
+  test('should render login form', () => {
     render(
       <Provider store={appStore}>
-        <Router>
+        <BrowserRouter>
           <Login />
-        </Router>
+        </BrowserRouter>
       </Provider>
     );
 
@@ -20,12 +21,12 @@ describe('Login Component', () => {
     expect(screen.getAllByText('Sign In').length).toBeGreaterThan(0);
   });
 
-  test('toggles to sign up form', () => {
+  test('should toggle to sign up form', () => {
     render(
       <Provider store={appStore}>
-        <Router>
+        <BrowserRouter>
           <Login />
-        </Router>
+        </BrowserRouter>
       </Provider>
     );
 
